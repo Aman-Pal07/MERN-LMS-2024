@@ -154,7 +154,3 @@ For any inquiries or suggestions, please contact the project maintainer:
 
 - **Email**: amannathpal@gmail.com
 - **GitHub**: [@Aman-Pal07](https://github.com/your-username)
-
----
-
-This README provides a comprehensive overview of the project. You can adjust or expand it to fit the specific features and configurations of your LMS.
