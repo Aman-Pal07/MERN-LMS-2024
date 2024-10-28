@@ -1,16 +1,17 @@
 import { Button } from "../ui/button";
 import FormControls from "./form-controls";
 
-const CommonForm = ({
+function CommonForm({
   handleSubmit,
   buttonText,
   formControls = [],
   formData,
   setFormData,
   isButtonDisabled = false,
-}) => {
+}) {
   return (
     <form onSubmit={handleSubmit}>
+      {/* render form controls here */}
       <FormControls
         formControls={formControls}
         formData={formData}
@@ -21,6 +22,6 @@ const CommonForm = ({
       </Button>
     </form>
   );
-};
+}
 
 export default CommonForm;

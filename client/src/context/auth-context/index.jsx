@@ -72,14 +72,15 @@ export default function AuthProvider({ children }) {
   }
 
   function resetCredentials() {
-    setAuth({ authenticate: false, user: null });
+    setAuth({
+      authenticate: false,
+      user: null,
+    });
   }
 
   useEffect(() => {
     checkAuthUser();
   }, []);
-
-  console.log(auth, "gf");
 
   return (
     <AuthContext.Provider
