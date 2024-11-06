@@ -1,27 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import VideoPlayer from "@/components/video-player";
-import { StudentContext } from "@/context/student-context";
-import { fetchStudentViewCourseDetailsService } from "@/services";
-import { CheckCircle, Copy, Globe, Lock, PlayCircle } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { DialogClose } from "@radix-ui/react-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import VideoPlayer from "@/components/video-player";
 import { AuthContext } from "@/context/auth-context";
+import { StudentContext } from "@/context/student-context";
+import {
+  checkCoursePurchaseInfoService,
+  createPaymentService,
+  fetchStudentViewCourseDetailsService,
+} from "@/services";
+import { CheckCircle, Globe, Lock, PlayCircle } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
-const StudentViewCourseDetailsPage = () => {
+function StudentViewCourseDetailsPage() {
   const {
     studentViewCourseDetails,
     setStudentViewCourseDetails,
@@ -42,6 +42,20 @@ const StudentViewCourseDetailsPage = () => {
   const location = useLocation();
 
   async function fetchStudentViewCourseDetails() {
+    // const checkCoursePurchaseInfoResponse =
+    //   await checkCoursePurchaseInfoService(
+    //     currentCourseDetailsId,
+    //     auth?.user._id
+    //   );
+
+    // if (
+    //   checkCoursePurchaseInfoResponse?.success &&
+    //   checkCoursePurchaseInfoResponse?.data
+    // ) {
+    //   navigate(`/course-progress/${currentCourseDetailsId}`);
+    //   return;
+    // }
+
     const response = await fetchStudentViewCourseDetailsService(
       currentCourseDetailsId
     );
@@ -55,11 +69,40 @@ const StudentViewCourseDetailsPage = () => {
     }
   }
 
-  function handleCreatePayment() {}
-
   function handleSetFreePreview(getCurrentVideoInfo) {
     console.log(getCurrentVideoInfo);
     setDisplayCurrentVideoFreePreview(getCurrentVideoInfo?.videoUrl);
+  }
+
+  async function handleCreatePayment() {
+    const paymentPayload = {
+      userId: auth?.user?._id,
+      userName: auth?.user?.userName,
+      userEmail: auth?.user?.userEmail,
+      orderStatus: "pending",
+      paymentMethod: "paypal",
+      paymentStatus: "initiated",
+      orderDate: new Date(),
+      paymentId: "",
+      payerId: "",
+      instructorId: studentViewCourseDetails?.instructorId,
+      instructorName: studentViewCourseDetails?.instructorName,
+      courseImage: studentViewCourseDetails?.image,
+      courseTitle: studentViewCourseDetails?.title,
+      courseId: studentViewCourseDetails?._id,
+      coursePricing: studentViewCourseDetails?.pricing,
+    };
+
+    console.log(paymentPayload, "paymentPayload");
+    const response = await createPaymentService(paymentPayload);
+
+    if (response.success) {
+      sessionStorage.setItem(
+        "currentOrderId",
+        JSON.stringify(response?.data?.orderId)
+      );
+      setApprovalUrl(response?.data?.approveUrl);
+    }
   }
 
   useEffect(() => {
@@ -83,12 +126,17 @@ const StudentViewCourseDetailsPage = () => {
 
   if (loadingState) return <Skeleton />;
 
+  if (approvalUrl !== "") {
+    window.location.href = approvalUrl;
+  }
+
   const getIndexOfFreePreviewUrl =
     studentViewCourseDetails !== null
       ? studentViewCourseDetails?.curriculum?.findIndex(
           (item) => item.freePreview
         )
       : -1;
+
   return (
     <div className=" mx-auto p-4">
       <div className="bg-gray-900 text-white p-8 rounded-t-lg">
@@ -236,6 +284,6 @@ const StudentViewCourseDetailsPage = () => {
       </Dialog>
     </div>
   );
-};
+}
 
 export default StudentViewCourseDetailsPage;

@@ -4,9 +4,8 @@ import { Button } from "../ui/button";
 import { useContext } from "react";
 import { AuthContext } from "@/context/auth-context";
 
-const StudentViewCommonHeader = () => {
+function StudentViewCommonHeader() {
   const navigate = useNavigate();
-
   const { resetCredentials } = useContext(AuthContext);
 
   function handleLogout() {
@@ -25,8 +24,12 @@ const StudentViewCommonHeader = () => {
         </Link>
         <div className="flex items-center space-x-1">
           <Button
-            onClick={() => navigate("/courses")}
             variant="ghost"
+            onClick={() => {
+              location.pathname.includes("/courses")
+                ? null
+                : navigate("/courses");
+            }}
             className="text-[14px] md:text-[16px] font-medium"
           >
             Explore Courses
@@ -35,7 +38,10 @@ const StudentViewCommonHeader = () => {
       </div>
       <div className="flex items-center space-x-4">
         <div className="flex gap-4 items-center">
-          <div className="flex cursor-pointer items-center gap-3">
+          <div
+            onClick={() => navigate("/student-courses")}
+            className="flex cursor-pointer items-center gap-3"
+          >
             <span className="font-extrabold md:text-xl text-[14px]">
               My Courses
             </span>
@@ -46,6 +52,6 @@ const StudentViewCommonHeader = () => {
       </div>
     </header>
   );
-};
+}
 
 export default StudentViewCommonHeader;
